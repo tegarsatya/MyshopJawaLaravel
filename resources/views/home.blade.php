@@ -14,7 +14,7 @@
                         </div>
                     @endif
 
-                    {{ __('You are logged in!') }}
+                    @livewire('counter')
                 </div>
             </div>
         </div>
