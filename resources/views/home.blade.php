@@ -13,8 +13,6 @@
                             {{ session('status') }}
                         </div>
                     @endif
-
-                    @livewire('counter')
                 </div>
             </div>
         </div>
