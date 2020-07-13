@@ -1,11 +1,11 @@
 <div class="container">
 
     @if ($formVisible)
-        {{-- @if (! $formUpdate) --}}
+        @if (! $formUpdate)
             @livewire('product.create')
-        {{-- @else
+        @else
             @livewire('product.update')
-        @endif --}}
+        @endif
     @endif
 
     <div class="row justify-content-center">

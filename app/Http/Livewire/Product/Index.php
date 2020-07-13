@@ -3,9 +3,9 @@
 namespace App\Http\Livewire\Product;
 
 use App\Product;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithPagination;
-
 
 class Index extends Component
 {
@@ -14,13 +14,14 @@ class Index extends Component
     public $paginate = 10;
     public $search;
     public $formVisible;
+    public $formUpdate = false;
 
-    protected $updateQueryString = [
-        ['search'   => ['except ' => '']],
+    protected $updatesQueryString = [
+        ['search' => ['except' => '']],
     ];
 
     protected $listeners = [
-        'formClose' => 'formCloseHadler',
+        'formClose' => 'formCloseHandler',
         'productStored' => 'productStoredHandler',
         'productUpdated' => 'productUpdatedHandler'
     ];
@@ -32,15 +33,14 @@ class Index extends Component
 
     public function render()
     {
-        return view('livewire.product.index',[
-            'products'   => $this->search === null ?
-                Product::latest()->paginate($this->paginate) :
-                Product::latest()->where('title', 'like', '%' .$this->search. '%')
-                                 ->paginate($this->paginate)
+        return view('livewire.product.index', [
+            'products' => $this->search === null ?
+                Product::latest()->paginate($this->paginate) : Product::latest()->where('title', 'like', '%' . $this->search . '%')
+                ->paginate($this->paginate)
         ]);
     }
 
-    public function formCloseHadler()
+    public function formCloseHandler()
     {
         $this->formVisible = false;
     }
@@ -51,9 +51,29 @@ class Index extends Component
         session()->flash('message', 'Your product was stored');
     }
 
+    public function editProduct($productId)
+    {
+        $this->formUpdate = true;
+        $this->formVisible = true;
+        $product = Product::find($productId);
+        $this->emit('editProduct', $product);
+    }
+
     public function productUpdatedHandler()
     {
         $this->formVisible = false;
         session()->flash('message', 'Your product was updated');
+    }
+
+    public function deleteProduct($productId)
+    {
+        $product = Product::find($productId);
+
+        if ($product->image) {
+            Storage::disk('public')->delete($product->image);
+        }
+
+        $product->delete();
+        session()->flash('message', 'Product was deleted!');
     }
 }
